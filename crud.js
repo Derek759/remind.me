@@ -1,6 +1,18 @@
 document.querySelector("#salvar").addEventListener("click", cadastrar)
 
+let lista_atividades = []
+
+window.addEventListener("load", () => {
+    lista_atividades = JSON.parse(localStorage.getItem("lista_atividades"))
+    if (lista_atividades!=null) {
+        lista_atividades.forEach((atividade) => {
+            document.querySelector("#atividades").innerHTML += gerarCard(atividade)
+        })
+    }
+})
+
 function cadastrar() {
+    const modal = bootstrap.Modal.getInstance(document.querySelector("#exampleModal"))
     let titulo = document.querySelector("#titulo").value
     let descricao = document.querySelector("#descricao").value
     let data = document.querySelector("#data").value
@@ -15,15 +27,31 @@ function cadastrar() {
         urgente: urgente
     }
 
+    if (atividade.titulo.length == 0) {
+        document.querySelector("#titulo").classList.add("is-invalid")
+        return
+    }
+
+    if (lista_atividades==null) {
+        lista_atividades = []
+    }
+
+    lista_atividades.push(atividade)
+
     document.querySelector("#atividades").innerHTML += gerarCard(atividade)
+
+    document.querySelector("#titulo").value = ""
+    document.querySelector("#descricao").value = ""
+
+
+    localStorage.setItem("lista_atividades", JSON.stringify(lista_atividades))
+
+    modal.hide()
 }
 
-/* function dados(atividade) {
-    if (urgente == "on") {
-        urgente = "urgenteee"
-        console.log(urgente)
-    }
-} */
+function apagar(botao) {
+    botao.parentNode.parentNode.parentNode.remove()
+}
 
 function gerarCard(atividade) {
     return `
@@ -45,7 +73,7 @@ function gerarCard(atividade) {
                 <a href="#" class="btn btn-success">
                     <i class="bi bi-check-lg"></i>
                 </a>
-                <a href="#" class="btn btn-danger">
+                <a onclick="apagar(this)" href="#" class="btn btn-danger">
                     <i class="bi bi-trash"></i>
                 </a>
             </div>
