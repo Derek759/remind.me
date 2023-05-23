@@ -3,24 +3,12 @@ document.querySelector("#salvar").addEventListener("click", cadastrar)
 let lista_atividades = []
 
 window.addEventListener("load", () => {
-    lista_atividades = JSON.parse(localStorage.getItem("lista_atividades")) || []
-    atualizar()
-})
-
-document.querySelector("#pendentes").addEventListener("click", () => {
-    lista_atividades = lista_atividades.filter(atividade => !atividade.concluida)
-    atualizar()
-})
-
-document.querySelector("#concluidas").addEventListener("click", () => {
-    lista_atividades = lista_atividades.filter(atividade => atividade.concluida)
-    atualizar()
-})
-
-document.querySelector("#busca").addEventListener("keyup", () => {
-    const titulo = document.querySelector("#busca").value
-    lista_atividades = lista_atividades.filter(atividade => atividade.titulo.includes(titulo))
-    atualizar()
+    lista_atividades = JSON.parse(localStorage.getItem("lista_atividades"))
+    if (lista_atividades!=null) {
+        lista_atividades.forEach((atividade) => {
+            document.querySelector("#atividades").innerHTML += gerarCard(atividade)
+        })
+    }
 })
 
 function cadastrar() {
@@ -56,34 +44,14 @@ function cadastrar() {
     document.querySelector("#titulo").value = ""
     document.querySelector("#descricao").value = ""
 
-    salvar()
+
+    localStorage.setItem("lista_atividades", JSON.stringify(lista_atividades))
 
     modal.hide()
 }
 
-function atualizar(){
-    document.querySelector("#atividades").innerHTML = ""
-    lista_atividades.forEach((atividade) => {
-        document.querySelector("#atividades").innerHTML += gerarCard(atividade)
-    })
-}
-
-function salvar() {
-    localStorage.setItem("lista_atividades", JSON.stringify(lista_atividades))
-}
-
-
-function apagar(id) {
-    lista_atividades = lista_atividades.filter(atividade => atividade.id != id)
-    salvar()
-    atualizar()
-}
-
-function concluir(id) {
-    let atividade_encontrada = lista_atividades.find(atividade => atividade.id == id)
-    atividade_encontrada.concluida = true
-    salvar()
-    atualizar()
+function apagar(botao) {
+    botao.parentNode.parentNode.parentNode.remove()
 }
 
 function gerarCard(atividade) {
@@ -107,7 +75,7 @@ function gerarCard(atividade) {
                 <a href="#" onClick="concluir(${atividade.id})" class="btn btn-success ${disabled}">
                     <i class="bi bi-check-lg"></i>
                 </a>
-                <a href="#" onClick="apagar(${atividade.id})" class="btn btn-danger">
+                <a onclick="apagar(this)" href="#" class="btn btn-danger">
                     <i class="bi bi-trash"></i>
                 </a>
             </div>
